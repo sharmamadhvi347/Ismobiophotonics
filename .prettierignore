@@ -1,0 +1,8 @@
+node_modules/
+dist/
+build/
+coverage/
+.expo/
+*.log
+pnpm-lock.yaml
+Intern_Task_Full_Stack_Developer.pdf

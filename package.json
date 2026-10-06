@@ -1,0 +1,36 @@
+{
+  "name": "ismobiophotonics-pms-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Full-Stack Project Management System Monorepo (Web, Mobile, Backend)",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@10.16.0",
+  "scripts": {
+    "build": "pnpm --filter \"./packages/*\" build && pnpm --filter \"./apps/api\" build && pnpm --filter \"./apps/web\" build",
+    "lint": "pnpm -r --parallel lint",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "test": "pnpm -r test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
+    "db:generate": "prisma generate --schema=prisma/schema.prisma",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "dev:api": "pnpm --filter @pms/api start:dev",
+    "dev:web": "pnpm --filter @pms/web dev",
+    "dev:mobile": "pnpm --filter @pms/mobile start"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
+    "eslint": "^9.20.0",
+    "prettier": "^3.5.0",
+    "prisma": "^6.3.1",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
+  }
+}

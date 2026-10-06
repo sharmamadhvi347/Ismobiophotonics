@@ -1,0 +1,15 @@
+{
+  "name": "@pms/config",
+  "version": "0.1.0",
+  "description": "Shared configuration constants for PMS monorepo",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.ts\" --no-error-on-unmatched-pattern"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

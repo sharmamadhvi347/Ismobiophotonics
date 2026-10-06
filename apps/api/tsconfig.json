@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": false,
+    "declarationMap": false,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2022",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "@pms/config": ["../../packages/config/src"],
+      "@pms/shared-types": ["../../packages/shared-types/src"],
+      "@pms/validation": ["../../packages/validation/src"]
+    }
+  },
+  "include": ["src/**/*", "test/**/*"]
+}

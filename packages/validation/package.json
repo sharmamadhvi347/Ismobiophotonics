@@ -1,0 +1,20 @@
+{
+  "name": "@pms/validation",
+  "version": "0.1.0",
+  "description": "Validation schemas using Zod shared across API, Web, and Mobile",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"src/**/*.ts\" --no-error-on-unmatched-pattern"
+  },
+  "dependencies": {
+    "@pms/config": "workspace:*",
+    "@pms/shared-types": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
