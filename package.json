@@ -10,8 +10,9 @@
   "packageManager": "pnpm@10.16.0",
   "scripts": {
     "build": "pnpm --filter \"./packages/*\" build && pnpm --filter \"./apps/api\" build && pnpm --filter \"./apps/web\" build",
+    "build:packages": "pnpm --filter \"./packages/*\" build",
     "lint": "pnpm -r --parallel lint",
-    "typecheck": "pnpm -r --parallel typecheck",
+    "typecheck": "pnpm build:packages && pnpm -r --parallel typecheck",
     "test": "pnpm -r test",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
