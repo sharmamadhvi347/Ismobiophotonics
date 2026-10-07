@@ -33,6 +33,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message = (resObj['message'] as string | string[]) || exception.message;
         error = (resObj['error'] as string) || error;
       }
+
+      if (status === HttpStatus.TOO_MANY_REQUESTS) {
+        error = 'Too Many Requests';
+        message = 'RATE_LIMIT_EXCEEDED';
+      }
     } else if (exception instanceof Error) {
       this.logger.error(
         `Unhandled exception on ${request.method} ${request.url}: ${exception.message}`,
