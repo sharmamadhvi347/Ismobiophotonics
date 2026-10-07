@@ -176,13 +176,127 @@ All exceptions are intercepted and formatted consistently by `HttpExceptionFilte
 
 ---
 
-### Projects (Module 02 - Target)
+### Projects (Module 02 - Active)
 
-- `GET /api/projects` — Lists projects owned by the user (supports search and status filter).
-- `GET /api/projects/:id` — Retrieves project details by ID with ownership verification.
-- `POST /api/projects` — Creates a new project.
-- `PUT /api/projects/:id` — Updates an existing project.
-- `DELETE /api/projects/:id` — Deletes a project and cascades deletion to nested tasks.
+All project endpoints require authentication via Bearer JWT (`Authorization: Bearer <accessToken>`). User ownership is automatically enforced; requests are strictly scoped to the authenticated user.
+
+#### 1. Create Project
+
+- **Method & Path:** `POST /api/projects`
+- **Auth:** Bearer JWT required
+- **Request Body:**
+  ```json
+  {
+    "name": "Project Alpha",
+    "description": "Core infrastructure revamp",
+    "status": "NOT_STARTED",
+    "startDate": "2026-10-01",
+    "endDate": "2026-12-31"
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-v4",
+      "name": "Project Alpha",
+      "description": "Core infrastructure revamp",
+      "status": "NOT_STARTED",
+      "startDate": "2026-10-01T00:00:00.000Z",
+      "endDate": "2026-12-31T00:00:00.000Z",
+      "userId": "user-uuid",
+      "createdAt": "2026-10-07T12:00:00.000Z",
+      "updatedAt": "2026-10-07T12:00:00.000Z"
+    },
+    "timestamp": "2026-10-07T12:00:00.000Z"
+  }
+  ```
+- **Error Codes:** `BAD_REQUEST` (400 - missing name, invalid dates, startDate > endDate), `AUTH_UNAUTHORIZED` (401).
+
+#### 2. List Projects (with Search, Filter, Pagination, and Sorting)
+
+- **Method & Path:** `GET /api/projects`
+- **Auth:** Bearer JWT required
+- **Query Parameters:**
+  - `page` (optional integer, default `1`, min `1`)
+  - `pageSize` (optional integer, default `20`, max `100`)
+  - `limit` (optional integer, alias for `pageSize`)
+  - `search` (optional string, case-insensitive match on project name)
+  - `status` (optional enum: `NOT_STARTED`, `IN_PROGRESS`, `COMPLETED`)
+  - `sortBy` (optional enum: `createdAt`, `name`, `startDate`, `endDate`, `status`, default `createdAt`)
+  - `sortOrder` (optional enum: `asc`, `desc`, default `desc`)
+- **Example:** `GET /api/projects?search=alpha&status=IN_PROGRESS&page=1&pageSize=20&sortBy=createdAt&sortOrder=desc`
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [
+        {
+          "id": "uuid-v4",
+          "name": "Project Alpha",
+          "description": "Core infrastructure revamp",
+          "status": "IN_PROGRESS",
+          "startDate": "2026-10-01T00:00:00.000Z",
+          "endDate": "2026-12-31T00:00:00.000Z",
+          "userId": "user-uuid",
+          "createdAt": "2026-10-07T12:00:00.000Z",
+          "updatedAt": "2026-10-07T12:00:00.000Z"
+        }
+      ],
+      "meta": {
+        "total": 1,
+        "page": 1,
+        "pageSize": 20,
+        "limit": 20,
+        "totalPages": 1,
+        "hasNextPage": false,
+        "hasPrevPage": false
+      }
+    },
+    "timestamp": "2026-10-07T12:00:00.000Z"
+  }
+  ```
+- **Error Codes:** `AUTH_UNAUTHORIZED` (401), `BAD_REQUEST` (400).
+
+#### 3. Get Single Project
+
+- **Method & Path:** `GET /api/projects/:id`
+- **Auth:** Bearer JWT required
+- **Path Parameters:**
+  - `id` (UUID v4 of the project)
+- **Response (200 OK):** Returns single `Project` object inside success envelope.
+- **Error Codes:** `NOT_FOUND` (404 - project not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
+
+#### 4. Update Project
+
+- **Method & Path:** `PUT /api/projects/:id`
+- **Auth:** Bearer JWT required
+- **Path Parameters:**
+  - `id` (UUID v4 of the project)
+- **Request Body:** Partial update fields (`name`, `description`, `status`, `startDate`, `endDate`).
+- **Response (200 OK):** Returns updated `Project` object.
+- **Error Codes:** `BAD_REQUEST` (400 - invalid date relationship or malformed input), `NOT_FOUND` (404 - project not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
+
+#### 5. Delete Project
+
+- **Method & Path:** `DELETE /api/projects/:id`
+- **Auth:** Bearer JWT required
+- **Path Parameters:**
+  - `id` (UUID v4 of the project)
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "success": true,
+      "message": "Project deleted successfully"
+    },
+    "timestamp": "2026-10-07T12:00:00.000Z"
+  }
+  ```
+- **Error Codes:** `NOT_FOUND` (404 - project not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
 
 ---
 
