@@ -121,7 +121,7 @@ export interface CreateTaskDto {
   priority?: TaskPriority;
   status?: TaskStatus;
   dueDate?: string;
-  projectId: string;
+  projectId?: string;
 }
 
 export interface UpdateTaskDto {
@@ -129,8 +129,10 @@ export interface UpdateTaskDto {
   description?: string;
   priority?: TaskPriority;
   status?: TaskStatus;
-  dueDate?: string;
+  dueDate?: string | null;
 }
+
+export type TaskSortBy = 'createdAt' | 'name' | 'dueDate' | 'priority' | 'status';
 
 export interface TaskFilterQuery {
   search?: string;
@@ -138,7 +140,10 @@ export interface TaskFilterQuery {
   priority?: TaskPriority;
   projectId?: string;
   page?: number;
+  pageSize?: number;
   limit?: number;
+  sortBy?: TaskSortBy;
+  sortOrder?: SortOrder;
 }
 
 // ==========================================

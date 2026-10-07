@@ -300,13 +300,150 @@ All project endpoints require authentication via Bearer JWT (`Authorization: Bea
 
 ---
 
-### Tasks (Module 03 - Target)
+### Tasks (Module 03 - Active)
 
-- `GET /api/tasks` — Lists tasks owned by the user (supports status, priority, and projectId filters).
-- `GET /api/tasks/:id` — Retrieves task details by ID.
-- `POST /api/tasks` — Creates a new task under a specific project.
-- `PUT /api/tasks/:id` — Updates task attributes, priority, or status.
-- `DELETE /api/tasks/:id` — Deletes a task.
+All task endpoints require authentication via Bearer JWT (`Authorization: Bearer <accessToken>`). User and project ownership are automatically verified; access across tenants or unauthorized projects safely returns 404 (`ResourceNotFoundException`), preventing IDOR and ID enumeration attacks.
+
+#### 1. Create Task Under Project
+
+- **Method & Path:** `POST /api/projects/:projectId/tasks`
+- **Auth:** Bearer JWT required
+- **Path Parameters:**
+  - `projectId` (UUID v4 of the parent project)
+- **Request Body:**
+  ```json
+  {
+    "name": "Implement JWT refresh rotation",
+    "description": "Add sliding window and family revocation to refresh tokens.",
+    "priority": "HIGH",
+    "status": "PENDING",
+    "dueDate": "2026-10-25"
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "task-uuid-v4",
+      "name": "Implement JWT refresh rotation",
+      "description": "Add sliding window and family revocation to refresh tokens.",
+      "priority": "HIGH",
+      "status": "PENDING",
+      "dueDate": "2026-10-25T00:00:00.000Z",
+      "projectId": "project-uuid-v4",
+      "userId": "user-uuid-v4",
+      "createdAt": "2026-10-07T12:00:00.000Z",
+      "updatedAt": "2026-10-07T12:00:00.000Z"
+    },
+    "timestamp": "2026-10-07T12:00:00.000Z"
+  }
+  ```
+- **Error Codes:** `BAD_REQUEST` (400 - missing name, invalid due date), `NOT_FOUND` (404 - project not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
+
+#### 2. List Tasks for a Project (with Search, Filter, Pagination, and Sorting)
+
+- **Method & Path:** `GET /api/projects/:projectId/tasks`
+- **Auth:** Bearer JWT required
+- **Path Parameters:**
+  - `projectId` (UUID v4 of the parent project)
+- **Query Parameters:**
+  - `page` (optional integer, default `1`, min `1`)
+  - `pageSize` (optional integer, default `20`, max `100`)
+  - `limit` (optional integer, alias for `pageSize`)
+  - `search` (optional string, case-insensitive match on task name or description)
+  - `status` (optional enum: `PENDING`, `IN_PROGRESS`, `COMPLETED`)
+  - `priority` (optional enum: `LOW`, `MEDIUM`, `HIGH`)
+  - `sortBy` (optional enum: `createdAt`, `name`, `dueDate`, `priority`, `status`, default `createdAt`)
+  - `sortOrder` (optional enum: `asc`, `desc`, default `desc`)
+- **Example:** `GET /api/projects/:projectId/tasks?search=JWT&status=PENDING&priority=HIGH&page=1&pageSize=20&sortBy=dueDate&sortOrder=asc`
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [
+        {
+          "id": "task-uuid-v4",
+          "name": "Implement JWT refresh rotation",
+          "description": "Add sliding window and family revocation to refresh tokens.",
+          "priority": "HIGH",
+          "status": "PENDING",
+          "dueDate": "2026-10-25T00:00:00.000Z",
+          "projectId": "project-uuid-v4",
+          "userId": "user-uuid-v4",
+          "createdAt": "2026-10-07T12:00:00.000Z",
+          "updatedAt": "2026-10-07T12:00:00.000Z"
+        }
+      ],
+      "meta": {
+        "total": 1,
+        "page": 1,
+        "pageSize": 20,
+        "limit": 20,
+        "totalPages": 1,
+        "hasNextPage": false,
+        "hasPrevPage": false
+      }
+    },
+    "timestamp": "2026-10-07T12:00:00.000Z"
+  }
+  ```
+- **Error Codes:** `NOT_FOUND` (404 - project not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
+
+#### 3. List All Tasks Across User Projects
+
+- **Method & Path:** `GET /api/tasks`
+- **Auth:** Bearer JWT required
+- **Query Parameters:** Same as project task list, plus optional `projectId` filter.
+- **Response (200 OK):** Paginated task list scoped to the authenticated user.
+- **Error Codes:** `AUTH_UNAUTHORIZED` (401), `NOT_FOUND` (404 - if specified `projectId` does not exist or belong to user).
+
+#### 4. Create Task (Direct Endpoint)
+
+- **Method & Path:** `POST /api/tasks`
+- **Auth:** Bearer JWT required
+- **Request Body:** Requires `projectId` in body payload alongside task attributes.
+- **Response (201 Created):** Same payload as `POST /api/projects/:projectId/tasks`.
+- **Error Codes:** `BAD_REQUEST` (400 - missing projectId or validation failure), `NOT_FOUND` (404 - project not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
+
+#### 5. Get Single Task by ID
+
+- **Method & Path:** `GET /api/tasks/:id`
+- **Auth:** Bearer JWT required
+- **Path Parameters:**
+  - `id` (UUID v4 of the task)
+- **Response (200 OK):** Returns single `Task` object.
+- **Error Codes:** `NOT_FOUND` (404 - task not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
+
+#### 6. Update Task
+
+- **Method & Path:** `PUT /api/tasks/:id`
+- **Auth:** Bearer JWT required
+- **Path Parameters:**
+  - `id` (UUID v4 of the task)
+- **Request Body:** Partial update fields (`name`, `description`, `priority`, `status`, `dueDate`). Reassignment of `projectId` or `userId` is strictly disallowed.
+- **Response (200 OK):** Returns updated `Task` object.
+- **Error Codes:** `BAD_REQUEST` (400 - malformed date or validation failure), `NOT_FOUND` (404 - task not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
+
+#### 7. Delete Task
+
+- **Method & Path:** `DELETE /api/tasks/:id`
+- **Auth:** Bearer JWT required
+- **Path Parameters:**
+  - `id` (UUID v4 of the task)
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "success": true,
+      "message": "Task deleted successfully"
+    },
+    "timestamp": "2026-10-07T12:00:00.000Z"
+  }
+  ```
+- **Error Codes:** `NOT_FOUND` (404 - task not found or not owned by user), `AUTH_UNAUTHORIZED` (401).
 
 ---
 
