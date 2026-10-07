@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
+import { ProjectsController } from './projects.controller';
+import { ProjectsService } from './projects.service';
 
-/**
- * ProjectsModule
- * Will encapsulate project CRUD, ownership verification, filtering, and pagination.
- */
-@Module({})
+@Module({
+  controllers: [ProjectsController],
+  providers: [ProjectsService],
+  exports: [ProjectsService],
+})
 export class ProjectsModule {}

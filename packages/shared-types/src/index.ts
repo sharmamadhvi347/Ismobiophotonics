@@ -86,11 +86,17 @@ export interface UpdateProjectDto {
   endDate?: string;
 }
 
+export type ProjectSortBy = 'createdAt' | 'name' | 'startDate' | 'endDate' | 'status';
+export type SortOrder = 'asc' | 'desc';
+
 export interface ProjectFilterQuery {
   search?: string;
   status?: ProjectStatus;
   page?: number;
+  pageSize?: number;
   limit?: number;
+  sortBy?: ProjectSortBy;
+  sortOrder?: SortOrder;
 }
 
 // ==========================================
@@ -168,6 +174,7 @@ export interface ApiErrorResponse {
 export interface PaginationMeta {
   total: number;
   page: number;
+  pageSize: number;
   limit: number;
   totalPages: number;
   hasNextPage: boolean;

@@ -56,6 +56,14 @@ export const logoutSchema = z.object({
 // ==========================================
 export const projectStatusSchema = z.enum(['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED']);
 
+const isValidDateString = (val: string): boolean => {
+  return !isNaN(Date.parse(val));
+};
+
+export const dateStringSchema = z
+  .string()
+  .refine(isValidDateString, { message: 'Must be a valid date or ISO 8601 string' });
+
 export const createProjectSchema = z
   .object({
     name: z
@@ -69,8 +77,8 @@ export const createProjectSchema = z
       .max(1000, 'Description cannot exceed 1000 characters')
       .optional(),
     status: projectStatusSchema.default('NOT_STARTED'),
-    startDate: z.string().datetime({ message: 'Start date must be an ISO 8601 string' }).optional(),
-    endDate: z.string().datetime({ message: 'End date must be an ISO 8601 string' }).optional(),
+    startDate: dateStringSchema.optional(),
+    endDate: dateStringSchema.optional(),
   })
   .refine(
     (data) => {
@@ -90,8 +98,8 @@ export const updateProjectSchema = z
     name: z.string().trim().min(1, 'Project name cannot be empty').max(120).optional(),
     description: z.string().trim().max(1000).optional(),
     status: projectStatusSchema.optional(),
-    startDate: z.string().datetime().optional().nullable(),
-    endDate: z.string().datetime().optional().nullable(),
+    startDate: dateStringSchema.optional().nullable(),
+    endDate: dateStringSchema.optional().nullable(),
   })
   .refine(
     (data) => {
@@ -105,6 +113,21 @@ export const updateProjectSchema = z
       path: ['endDate'],
     },
   );
+
+export const projectSortBySchema = z.enum(['createdAt', 'name', 'startDate', 'endDate', 'status']);
+export const sortOrderSchema = z.enum(['asc', 'desc']);
+
+export const projectFilterSchema = z.object({
+  search: z.string().trim().max(100).optional(),
+  status: projectStatusSchema.optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  sortBy: projectSortBySchema.default('createdAt'),
+  sortOrder: sortOrderSchema.default('desc'),
+});
+
+export type ProjectFilterInput = z.infer<typeof projectFilterSchema>;
 
 // ==========================================
 // Task Schemas
