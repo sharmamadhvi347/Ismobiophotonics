@@ -2,7 +2,7 @@ name: CI Quality Gate
 
 on:
   push:
-    branches: [main, 'feat/**']
+    branches: [main, 'feat/**', 'fix/**']
   pull_request:
     branches: [main]
 
@@ -44,6 +44,9 @@ jobs:
 
       - name: Generate Prisma Client
         run: pnpm db:generate
+
+      - name: Build Shared Packages
+        run: pnpm build:packages
 
       - name: Run Linter
         run: pnpm lint

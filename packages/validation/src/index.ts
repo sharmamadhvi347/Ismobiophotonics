@@ -29,10 +29,6 @@ export const registerSchema = z.object({
     .max(
       AUTH_CONFIG.PASSWORD_MAX_LENGTH,
       `Password must not exceed ${AUTH_CONFIG.PASSWORD_MAX_LENGTH} characters`,
-    )
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number',
     ),
 });
 
@@ -43,6 +39,16 @@ export const loginSchema = z.object({
     .toLowerCase()
     .email('Please provide a valid email address'),
   password: z.string({ required_error: 'Password is required' }).min(1, 'Password is required'),
+});
+
+export const refreshSchema = z.object({
+  refreshToken: z
+    .string({ required_error: 'Refresh token is required' })
+    .min(1, 'Refresh token cannot be empty'),
+});
+
+export const logoutSchema = z.object({
+  refreshToken: z.string().optional(),
 });
 
 // ==========================================
@@ -150,6 +156,8 @@ export const taskFilterQuerySchema = paginationQuerySchema.extend({
 // Inferred Types
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type RefreshInput = z.infer<typeof refreshSchema>;
+export type LogoutInput = z.infer<typeof logoutSchema>;
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;

@@ -1,5 +1,7 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import configuration from './config/configuration';
 import { PrismaModule } from './database/prisma.module';
 import { CorrelationIdMiddleware } from './common/middleware';
@@ -17,6 +19,13 @@ import { AuditModule } from './modules/audit/audit.module';
       isGlobal: true,
       load: [configuration],
     }),
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60000,
+        limit: 60,
+      },
+    ]),
     PrismaModule,
     HealthModule,
     AuthModule,
@@ -25,6 +34,12 @@ import { AuditModule } from './modules/audit/audit.module';
     TasksModule,
     DashboardModule,
     AuditModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule implements NestModule {
