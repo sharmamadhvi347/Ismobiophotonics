@@ -20,11 +20,10 @@ export class ApiError extends Error {
   }
 }
 
-// 10.0.2.2 is Android emulator's alias for the host loopback (localhost)
-const RAW_BASE_URL = (process.env.EXPO_PUBLIC_API_BASE_URL || 'http://10.0.2.2:3000').replace(
-  /\/+$/,
-  '',
-);
+// Production API endpoint default (overridable via EXPO_PUBLIC_API_BASE_URL)
+const RAW_BASE_URL = (
+  process.env.EXPO_PUBLIC_API_BASE_URL || 'https://pms-api-gdm2.onrender.com'
+).replace(/\/+$/, '');
 const API_BASE = `${RAW_BASE_URL}/api`;
 
 type SessionExpiredHandler = () => void;

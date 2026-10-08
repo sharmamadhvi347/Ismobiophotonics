@@ -62,7 +62,7 @@ To ensure compatibility across local development, physical devices, and Android 
 2. **Environment Variable Configuration:**
    - Parameter: `EXPO_PUBLIC_API_BASE_URL` in `apps/mobile/.env`.
    - Physical device testing: set `EXPO_PUBLIC_API_BASE_URL=http://<host-lan-ip>:3000`.
-   - Production / Cloud: set `EXPO_PUBLIC_API_BASE_URL=https://api.yourdomain.com`.
+   - Production / Cloud: set `EXPO_PUBLIC_API_BASE_URL=https://pms-api-gdm2.onrender.com`.
 
 ---
 
