@@ -15,7 +15,12 @@ async function bootstrap(): Promise<void> {
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('port', APP_CONFIG.DEFAULT_PORT);
-  const corsOrigin = configService.get<string>('cors.origin', 'http://localhost:5173');
+  const rawCorsOrigin = configService.get<string>('cors.origin', 'http://localhost:5173');
+  const corsOrigin = rawCorsOrigin.includes(',')
+    ? rawCorsOrigin.split(',').map((o) => o.trim())
+    : rawCorsOrigin === '*'
+      ? true
+      : rawCorsOrigin;
 
   // CORS configuration
   app.enableCors({
