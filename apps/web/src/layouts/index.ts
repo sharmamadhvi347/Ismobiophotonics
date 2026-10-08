@@ -1,4 +1,1 @@
-/**
- * Layout components (AuthLayout, DashboardLayout, Navbar, Sidebar)
- */
-export {};
+export * from './app-layout';
