@@ -65,8 +65,7 @@ This guide provides step-by-step instructions to deploy the Project Management S
 6. Render will:
    - Provision PostgreSQL and generate the internal `DATABASE_URL`.
    - Run `pnpm install --frozen-lockfile && pnpm build:api`.
-   - Run `pnpm db:push` to automatically synchronize the Prisma schema and create all tables.
-   - Start the service with `pnpm start:api`.
+   - Execute start command `pnpm db:push && pnpm start:api` (automatically synchronizes the Prisma schema with the provisioned PostgreSQL database on startup before accepting traffic).
    - Verify health via `GET /api/health`.
 7. Once deployment finishes, copy the generated service URL (e.g., `https://pms-api-xxxx.onrender.com`).
 
