@@ -1,38 +1,72 @@
-import React from 'react';
-import { APP_CONFIG } from '@pms/config';
+import React, { useEffect } from 'react';
+import { AuthProvider, useAuth } from './context/auth-context';
+import { RouterProvider, useRouter } from './context/router-context';
+import { AppLayout } from './layouts/app-layout';
+import { LoginPage } from './pages/login-page';
+import { RegisterPage } from './pages/register-page';
+import { DashboardPage } from './pages/dashboard-page';
+import { ProjectsPage } from './pages/projects-page';
+import { ProjectDetailPage } from './pages/project-detail-page';
+import { NotFoundPage } from './pages/not-found-page';
+import { LoadingSpinner } from './components/ui';
 import './index.css';
+
+const AppRoutes: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const { path, params, navigate } = useRouter();
+
+  useEffect(() => {
+    // If route is / and user is authenticated, redirect to /dashboard
+    if (path === '/' && isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [path, isAuthenticated, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="auth-wrapper">
+        <LoadingSpinner message="Restoring workspace session..." />
+      </div>
+    );
+  }
+
+  // Public unauthenticated routes
+  if (path === '/login') {
+    return <LoginPage />;
+  }
+
+  if (path === '/register') {
+    return <RegisterPage />;
+  }
+
+  // Protected route boundary
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
+  // Authenticated routes wrapped with AppLayout
+  return (
+    <AppLayout>
+      {path === '/' || path === '/dashboard' ? (
+        <DashboardPage />
+      ) : path === '/projects' ? (
+        <ProjectsPage />
+      ) : params.id ? (
+        <ProjectDetailPage />
+      ) : (
+        <NotFoundPage />
+      )}
+    </AppLayout>
+  );
+};
 
 export const App: React.FC = () => {
   return (
-    <div className="container">
-      <div className="card">
-        <span className="badge">Module 00: Foundation Established</span>
-        <h1>{APP_CONFIG.APP_NAME}</h1>
-        <p>
-          Web client architecture foundation initialized with React, TypeScript, and Vite in strict
-          mode.
-        </p>
-
-        <div className="grid">
-          <div className="grid-item">
-            <strong>Architecture</strong>
-            <p>Modular Monorepo</p>
-          </div>
-          <div className="grid-item">
-            <strong>API Target</strong>
-            <p>NestJS REST API</p>
-          </div>
-          <div className="grid-item">
-            <strong>Database</strong>
-            <p>PostgreSQL + Prisma</p>
-          </div>
-          <div className="grid-item">
-            <strong>Status</strong>
-            <p>Foundation Active</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AuthProvider>
+      <RouterProvider>
+        <AppRoutes />
+      </RouterProvider>
+    </AuthProvider>
   );
 };
 

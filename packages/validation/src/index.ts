@@ -144,8 +144,8 @@ export const createTaskSchema = z.object({
   description: z.string().trim().max(2000, 'Description cannot exceed 2000 characters').optional(),
   priority: taskPrioritySchema.default('MEDIUM'),
   status: taskStatusSchema.default('PENDING'),
-  dueDate: z.string().datetime({ message: 'Due date must be an ISO 8601 string' }).optional(),
-  projectId: z.string().uuid({ message: 'A valid project ID is required' }),
+  dueDate: dateStringSchema.optional(),
+  projectId: z.string().uuid({ message: 'A valid project ID is required' }).optional(),
 });
 
 export const updateTaskSchema = z.object({
@@ -153,8 +153,24 @@ export const updateTaskSchema = z.object({
   description: z.string().trim().max(2000).optional(),
   priority: taskPrioritySchema.optional(),
   status: taskStatusSchema.optional(),
-  dueDate: z.string().datetime().optional().nullable(),
+  dueDate: dateStringSchema.optional().nullable(),
 });
+
+export const taskSortBySchema = z.enum(['createdAt', 'name', 'dueDate', 'priority', 'status']);
+
+export const taskFilterSchema = z.object({
+  search: z.string().trim().max(100).optional(),
+  status: taskStatusSchema.optional(),
+  priority: taskPrioritySchema.optional(),
+  projectId: z.string().uuid().optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  sortBy: taskSortBySchema.default('createdAt'),
+  sortOrder: sortOrderSchema.default('desc'),
+});
+
+export type TaskFilterInput = z.infer<typeof taskFilterSchema>;
 
 // ==========================================
 // Query Schemas
