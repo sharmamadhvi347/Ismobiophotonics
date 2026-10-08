@@ -447,6 +447,25 @@ All task endpoints require authentication via Bearer JWT (`Authorization: Bearer
 
 ---
 
-### Dashboard (Module 04 - Target)
+### Dashboard (Module 04 - Active)
 
-- `GET /api/dashboard` — Aggregates user metrics (total projects, total tasks, completed, pending, in-progress).
+#### 1. Get Workspace Dashboard Metrics
+
+- **Method & Path:** `GET /api/dashboard`
+- **Auth:** Bearer JWT required (`Authorization: Bearer <accessToken>`)
+- **Description:** Aggregates high-level project and task metrics strictly scoped to the authenticated user.
+- **Response (200 OK):**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "totalProjects": 5,
+      "totalTasks": 12,
+      "completedTasks": 7,
+      "pendingTasks": 3,
+      "projectsInProgress": 2
+    },
+    "timestamp": "2026-10-07T12:00:00.000Z"
+  }
+  ```
+- **Error Codes:** `AUTH_UNAUTHORIZED` (401).

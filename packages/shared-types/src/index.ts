@@ -154,7 +154,8 @@ export interface DashboardMetrics {
   totalTasks: number;
   completedTasks: number;
   pendingTasks: number;
-  inProgressProjects: number;
+  projectsInProgress: number;
+  inProgressProjects?: number;
 }
 
 // ==========================================
