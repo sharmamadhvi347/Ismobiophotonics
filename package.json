@@ -17,8 +17,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
     "db:generate": "prisma generate --schema=prisma/schema.prisma",
+    "db:push": "prisma db push --schema=prisma/schema.prisma",
+    "db:migrate": "prisma migrate deploy --schema=prisma/schema.prisma",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
+    "build:api": "pnpm build:packages && pnpm db:generate && pnpm --filter @pms/api build",
+    "start:api": "node apps/api/dist/apps/api/src/main",
     "dev:api": "pnpm --filter @pms/api start:dev",
     "dev:web": "pnpm --filter @pms/web dev",
     "dev:mobile": "pnpm --filter @pms/mobile start"
